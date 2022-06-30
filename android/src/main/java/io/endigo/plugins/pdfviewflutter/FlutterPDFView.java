@@ -206,7 +206,7 @@ public class FlutterPDFView implements PlatformView, MethodCallHandler {
         if (parsed.getScheme() == null || parsed.getScheme().isEmpty()) {
             return Uri.fromFile(new File(uri));
         }
-        return  Uri.parse('');
+        return  parsed;
     }
 
 }
