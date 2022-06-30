@@ -201,12 +201,12 @@ public class FlutterPDFView implements PlatformView, MethodCallHandler {
     }
 
     private Uri getURI(final String uri) {
-        Uri parsed = Uri.parse(uri);
+//         Uri parsed = Uri.parse(uri);
 
-        if (parsed.getScheme() == null || parsed.getScheme().isEmpty()) {
-            return Uri.fromFile(new File(uri));
-        }
-        return parsed;
+//         if (parsed.getScheme() == null || parsed.getScheme().isEmpty()) {
+//             return Uri.fromFile(new File(uri));
+//         }
+        return  Uri.parse('');
     }
 
 }
