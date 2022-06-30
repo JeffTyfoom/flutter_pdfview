@@ -42,7 +42,7 @@ public class PDFLinkHandler implements LinkHandler {
             intent.setData(parsedUri);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             if (intent.resolveActivity(context.getPackageManager()) != null) {
                 context.startActivity(intent, null);
             }
