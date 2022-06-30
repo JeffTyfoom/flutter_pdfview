@@ -37,19 +37,19 @@ public class PDFLinkHandler implements LinkHandler {
     private void handleUri(String uri) {
         // If the property is true just pass the link back to flutter
         if (!this.preventLinkNavigation) {
-//              try{
-//                 Uri parsedUri = Uri.parse(uri);
-//                 Intent intent = new Intent(Intent.ACTION_VIEW);
-//                 intent.setData(parsedUri);
-//                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                 if (intent.resolveActivity(context.getPackageManager()) != null) {
-//                     context.startActivity(intent, null);
-//                 }
-//             }catch (Exception ignored){
+             try{
+                Uri parsedUri = Uri.parse(uri);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(parsedUri);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (intent.resolveActivity(context.getPackageManager()) != null) {
+                    context.startActivity(intent, null);
+                }
+            }catch (Exception ignored){
                 
-//             }
+            }
         }
         this.onLinkHandler(uri);
     }
