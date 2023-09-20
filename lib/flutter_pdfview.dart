@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -39,19 +38,28 @@ class PDFView extends StatefulWidget {
     this.defaultPage = 0,
     this.fitPolicy = FitPolicy.WIDTH,
     this.preventLinkNavigation = false,
-  })
-      : assert(filePath != null || pdfData != null),
+  })  : assert(filePath != null || pdfData != null),
         super(key: key);
 
   @override
   _PDFViewState createState() => _PDFViewState();
 
-  /// If not null invoked once the web view is created.
+  /// If not null invoked once the PDFView is created.
   final PDFViewCreatedCallback? onViewCreated;
+
+  /// Return PDF page count as a parameter
   final RenderCallback? onRender;
+
+  /// Return current page and page count as a parameter
   final PageChangedCallback? onPageChanged;
+
+  /// Invokes on error that handled on native code
   final ErrorCallback? onError;
+
+  /// Invokes on page cannot be rendered or something happens
   final PageErrorCallback? onPageError;
+
+  /// Used with preventLinkNavigation=true. It's helpful to customize link navigation
   final LinkHandlerCallback? onLinkHandler;
 
   /// Which gestures should be consumed by the pdf view.
@@ -67,32 +75,61 @@ class PDFView extends StatefulWidget {
 
   /// The initial URL to load.
   final String? filePath;
+
+  /// The binary data of a PDF document
   final Uint8List? pdfData;
 
+  /// Indicates whether or not the user can swipe to change pages in the PDF document. If set to true, swiping is enabled.
   final bool enableSwipe;
+
+  /// Indicates whether or not the user can swipe horizontally to change pages in the PDF document. If set to true, horizontal swiping is enabled.
   final bool swipeHorizontal;
+
+  /// Represents the password for a password-protected PDF document. It can be nullable
   final String? password;
+
+  /// Indicates whether or not the PDF viewer is in night mode. If set to true, the viewer is in night mode
   final bool nightMode;
+
+  /// Indicates whether or not the PDF viewer automatically adds spacing between pages. If set to true, spacing is added.
   final bool autoSpacing;
+
+  /// Indicates whether or not the user can "fling" pages in the PDF document. If set to true, page flinging is enabled.
   final bool pageFling;
+
+  /// Indicates whether or not the viewer snaps to a page after the user has scrolled to it. If set to true, snapping is enabled.
   final bool pageSnap;
+
+  /// Represents the default page to display when the PDF document is loaded.
   final int defaultPage;
+
+  /// FitPolicy that determines how the PDF pages are fit to the screen. The FitPolicy enum can take on the following values:
+  /// - FitPolicy.WIDTH: The PDF pages are scaled to fit the width of the screen.
+  /// - FitPolicy.HEIGHT: The PDF pages are scaled to fit the height of the screen.
+  /// - FitPolicy.BOTH: The PDF pages are scaled to fit both the width and height of the screen.
   final FitPolicy fitPolicy;
+
+  /// fitEachPage
+  @Deprecated("will be removed next version")
   final bool fitEachPage;
+
+  /// Indicates whether or not clicking on links in the PDF document will open the link in a new page. If set to true, link navigation is prevented.
   final bool preventLinkNavigation;
 }
 
 class _PDFViewState extends State<PDFView> {
   final Completer<PDFViewController> _controller =
-  Completer<PDFViewController>();
+      Completer<PDFViewController>();
 
   @override
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return PlatformViewLink(
         viewType: 'plugins.endigo.io/pdfview',
-        surfaceFactory: (BuildContext context,
-            PlatformViewController controller,) {
+        surfaceFactory: (
+          BuildContext context,
+          PlatformViewController controller,
+        ) {
           return AndroidViewSurface(
             controller: controller as AndroidViewController,
             gestureRecognizers: widget.gestureRecognizers ??
@@ -108,9 +145,8 @@ class _PDFViewState extends State<PDFView> {
             creationParams: _CreationParams.fromWidget(widget).toMap(),
             creationParamsCodec: const StandardMessageCodec(),
           )
-            ..addOnPlatformViewCreatedListener(params
-                .onPlatformViewCreated)..addOnPlatformViewCreatedListener((
-                int id) {
+            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+            ..addOnPlatformViewCreatedListener((int id) {
               _onPlatformViewCreated(id);
             })
             ..create();
@@ -141,7 +177,7 @@ class _PDFViewState extends State<PDFView> {
   void didUpdateWidget(PDFView oldWidget) {
     super.didUpdateWidget(oldWidget);
     _controller.future.then(
-            (PDFViewController controller) => controller._updateWidget(widget));
+        (PDFViewController controller) => controller._updateWidget(widget));
   }
 }
 
@@ -178,17 +214,18 @@ class _CreationParams {
 }
 
 class _PDFViewSettings {
-  _PDFViewSettings({this.enableSwipe,
-    this.swipeHorizontal,
-    this.password,
-    this.nightMode,
-    this.autoSpacing,
-    this.pageFling,
-    this.pageSnap,
-    this.defaultPage,
-    this.fitPolicy,
-    this.fitEachPage,
-    this.preventLinkNavigation});
+  _PDFViewSettings(
+      {this.enableSwipe,
+      this.swipeHorizontal,
+      this.password,
+      this.nightMode,
+      this.autoSpacing,
+      this.pageFling,
+      this.pageSnap,
+      this.defaultPage,
+      this.fitPolicy,
+      // this.fitEachPage,
+      this.preventLinkNavigation});
 
   static _PDFViewSettings fromWidget(PDFView widget) {
     return _PDFViewSettings(
@@ -213,7 +250,7 @@ class _PDFViewSettings {
   final bool? pageSnap;
   final int? defaultPage;
   final FitPolicy? fitPolicy;
-  final bool? fitEachPage;
+  // final bool? fitEachPage;
   final bool? preventLinkNavigation;
 
   Map<String, dynamic> toMap() {
@@ -227,7 +264,7 @@ class _PDFViewSettings {
       'pageSnap': pageSnap,
       'defaultPage': defaultPage,
       'fitPolicy': fitPolicy.toString(),
-      'fitEachPage': fitEachPage,
+      // 'fitEachPage': fitEachPage,
       'preventLinkNavigation': preventLinkNavigation
     };
   }
@@ -251,9 +288,10 @@ class _PDFViewSettings {
 }
 
 class PDFViewController {
-  PDFViewController._(int id,
-      this._widget,)
-      : _channel = MethodChannel('plugins.endigo.io/pdfview_$id') {
+  PDFViewController._(
+    int id,
+    this._widget,
+  ) : _channel = MethodChannel('plugins.endigo.io/pdfview_$id') {
     _settings = _PDFViewSettings.fromWidget(_widget);
     _channel.setMethodCallHandler(_onMethodCall);
   }
@@ -314,7 +352,7 @@ class PDFViewController {
 
   Future<bool?> setPage(int page) async {
     final bool? isSet =
-    await _channel.invokeMethod('setPage', <String, dynamic>{
+        await _channel.invokeMethod('setPage', <String, dynamic>{
       'page': page,
     });
     return isSet;
